@@ -28,7 +28,7 @@ def health_check():
     Endpoint de health check usado pelo ALB.
     Se esse endpoint responder 200, o ALB considera a task saudável.
     """
-    return {"status": "healthy", "timestamp": datetime.utcnow().isoformat()}
+    return {"status": "healthy", "service": "Banco X API", "timestamp": datetime.utcnow().isoformat()}
 
 
 @app.get("/saldo/{conta_id}")
