@@ -1,0 +1,62 @@
+name: Banco X — Destroy Infraestrutura
+
+on:
+  workflow_dispatch:
+    inputs:
+      ambiente:
+        description: 'Ambiente a ser destruído'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+      confirmacao:
+        description: 'Digite DESTRUIR para confirmar'
+        required: true
+        type: string
+
+env:
+  AWS_REGION: us-east-1
+
+jobs:
+  destroy:
+    name: Terraform Destroy
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Validar confirmação
+        if: ${{ github.event.inputs.confirmacao != 'DESTRUIR' }}
+        run: |
+          echo "Confirmacao incorreta. Digite exatamente DESTRUIR para prosseguir."
+          exit 1
+
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar credenciais AWS via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::905542450009:role/bancox-github-actions-role
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.6.0"
+
+      - name: Terraform Init
+        working-directory: ${{ github.event.inputs.ambiente }}
+        run: terraform init
+
+      - name: Terraform Destroy
+        working-directory: ${{ github.event.inputs.ambiente }}
+        run: terraform destroy -auto-approve
+
+      - name: Confirmar destroy concluído
+        run: |
+          echo "Infraestrutura do ambiente ${{ github.event.inputs.ambiente }} destruída com sucesso!"
+          echo "Timestamp: $(date '+%Y-%m-%d %H:%M:%S')"
