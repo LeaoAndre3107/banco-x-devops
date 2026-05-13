@@ -1,0 +1,76 @@
+name: Terraform Destroy
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Ambiente a destruir"
+        required: true
+        type: choice
+        options:
+          - dev
+          - prod
+      confirm:
+        description: 'Digite "DESTRUIR" para confirmar'
+        required: true
+        type: string
+
+permissions:
+  id-token: write   # necessário para OIDC
+  contents: read
+
+jobs:
+  validate-confirmation:
+    name: Validar Confirmação
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checar confirmação
+        run: |
+          if [ "${{ github.event.inputs.confirm }}" != "DESTRUIR" ]; then
+            echo "❌ Confirmação inválida. Digite exatamente: DESTRUIR"
+            exit 1
+          fi
+          echo "✅ Confirmação válida"
+
+  terraform-destroy:
+    name: Terraform Destroy (${{ github.event.inputs.environment }})
+    runs-on: ubuntu-latest
+    needs: validate-confirmation
+    environment: ${{ github.event.inputs.environment }}   # exige aprovação de environment no GitHub
+
+    defaults:
+      run:
+        working-directory: ${{ github.event.inputs.environment }}  # pasta dev/ ou prod/
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~1.7"
+
+      - name: Autenticar na AWS via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Plan Destroy
+        run: terraform plan -destroy -out=tfplan-destroy
+        # Gera o plano para você ver o que será destruído nos logs
+
+      - name: Terraform Destroy
+        run: terraform destroy -auto-approve
+
+      - name: Resumo
+        if: always()
+        run: |
+          echo "## 💣 Terraform Destroy" >> $GITHUB_STEP_SUMMARY
+          echo "- **Ambiente:** ${{ github.event.inputs.environment }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Executado por:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Data/Hora:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
