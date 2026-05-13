@@ -1,0 +1,292 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); color: var(--color-text-primary); }
+  .doc { max-width: 680px; padding: 0 0 32px; }
+
+  .header { padding: 28px 28px 20px; border-bottom: 1px solid var(--color-border-tertiary); margin-bottom: 24px; }
+  .bank-badge { display: inline-flex; align-items: center; gap: 8px; background: #0C447C; color: #B5D4F4; font-size: 11px; font-weight: 500; padding: 4px 10px; border-radius: 4px; letter-spacing: 0.05em; margin-bottom: 12px; }
+  .project-title { font-size: 22px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 6px; }
+  .project-sub { font-size: 14px; color: var(--color-text-secondary); }
+  .meta-row { display: flex; gap: 24px; margin-top: 16px; flex-wrap: wrap; }
+  .meta-item { font-size: 12px; color: var(--color-text-tertiary); }
+  .meta-item strong { color: var(--color-text-secondary); font-weight: 500; }
+
+  .section { padding: 0 28px; margin-bottom: 28px; }
+  .section-title { font-size: 11px; font-weight: 500; letter-spacing: 0.08em; color: var(--color-text-tertiary); text-transform: uppercase; margin-bottom: 14px; padding-bottom: 6px; border-bottom: 1px solid var(--color-border-tertiary); }
+
+  .context-box { background: var(--color-background-secondary); border-radius: 8px; padding: 16px; font-size: 14px; color: var(--color-text-secondary); line-height: 1.7; border-left: 3px solid #185FA5; }
+
+  .stack-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .stack-item { background: var(--color-background-secondary); border-radius: 8px; padding: 12px 14px; border: 1px solid var(--color-border-tertiary); }
+  .stack-layer { font-size: 10px; font-weight: 500; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .stack-tech { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 2px; }
+  .stack-why { font-size: 12px; color: var(--color-text-secondary); line-height: 1.5; }
+  .stack-new { display: inline-block; font-size: 10px; background: #1D9E75; color: #E1F5EE; padding: 1px 6px; border-radius: 3px; margin-left: 6px; vertical-align: middle; }
+
+  .phases { display: flex; flex-direction: column; gap: 12px; }
+  .phase-card { border: 1px solid var(--color-border-tertiary); border-radius: 10px; overflow: hidden; cursor: pointer; transition: border-color 0.2s; }
+  .phase-card:hover { border-color: var(--color-border-secondary); }
+  .phase-card.open .phase-body { display: block; }
+  .phase-header { display: flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--color-background-secondary); }
+  .phase-num { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; flex-shrink: 0; }
+  .phase-info { flex: 1; }
+  .phase-name { font-size: 14px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 2px; }
+  .phase-desc { font-size: 12px; color: var(--color-text-secondary); }
+  .phase-arrow { font-size: 12px; color: var(--color-text-tertiary); transition: transform 0.2s; }
+  .phase-card.open .phase-arrow { transform: rotate(90deg); }
+  .phase-body { display: none; padding: 16px; border-top: 1px solid var(--color-border-tertiary); }
+  .deliverables { margin-bottom: 12px; }
+  .del-title { font-size: 11px; font-weight: 500; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+  .del-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .del-list li { font-size: 13px; color: var(--color-text-secondary); padding-left: 16px; position: relative; line-height: 1.5; }
+  .del-list li::before { content: "→"; position: absolute; left: 0; color: var(--color-text-tertiary); }
+  .learns { background: var(--color-background-secondary); border-radius: 6px; padding: 10px 12px; }
+  .learn-title { font-size: 11px; font-weight: 500; color: #0F6E56; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+  .learn-list { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; }
+  .learn-list li { font-size: 11px; background: #E1F5EE; color: #085041; padding: 3px 8px; border-radius: 4px; }
+
+  .principles { display: flex; flex-direction: column; gap: 8px; }
+  .principle { display: flex; gap: 12px; align-items: flex-start; padding: 10px 12px; background: var(--color-background-secondary); border-radius: 8px; }
+  .p-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .p-text { font-size: 13px; color: var(--color-text-secondary); line-height: 1.5; }
+  .p-text strong { color: var(--color-text-primary); font-weight: 500; }
+
+  @media (max-width: 480px) { .stack-grid { grid-template-columns: 1fr; } .meta-row { gap: 12px; } }
+</style>
+
+<div class="doc">
+  <div class="header">
+    <div class="bank-badge">CONFIDENCIAL — USO INTERNO</div>
+    <div class="project-title">Projeto Banco X — Sistema de Consulta de Valor</div>
+    <div class="project-sub">Infraestrutura cloud-native de alta disponibilidade na AWS</div>
+    <div class="meta-row">
+      <div class="meta-item"><strong>Papel:</strong> DevOps Engineer (Junior)</div>
+      <div class="meta-item"><strong>Orientação:</strong> Dev Sênior</div>
+      <div class="meta-item"><strong>Fases:</strong> 6 etapas</div>
+      <div class="meta-item"><strong>Cloud:</strong> AWS + Terraform</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Contexto corporativo</div>
+    <div class="context-box">
+      O Banco X precisa disponibilizar um sistema interno de consulta de saldo para seus funcionários. O sistema deve ser acessado via CLI segura, escalar automaticamente em picos de demanda, nunca sair do ar, e ter toda consulta auditada. A infraestrutura será provisionada via código, com ambientes isolados de dev e prod, e entregues de forma contínua via pipeline automatizado.
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Stack tecnológica</div>
+    <div class="stack-grid">
+      <div class="stack-item">
+        <div class="stack-layer">Imagem base</div>
+        <div class="stack-tech">Packer <span class="stack-new">novo</span></div>
+        <div class="stack-why">Cria AMI customizada com Docker + agente ECS pré-instalados. Instâncias sobem prontas, sem depender de user_data.</div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-layer">Infraestrutura como código</div>
+        <div class="stack-tech">Terraform</div>
+        <div class="stack-why">Multi-ambiente dev/prod com módulos reutilizáveis e estado remoto em S3 + DynamoDB.</div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-layer">Compute — API</div>
+        <div class="stack-tech">ECS Fargate <span class="stack-new">novo</span></div>
+        <div class="stack-why">Serverless. Sem gerenciar VMs. Escala automática. Ideal para a API de consulta de saldo.</div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-layer">Compute — Workers</div>
+        <div class="stack-tech">ECS EC2 <span class="stack-new">novo</span></div>
+        <div class="stack-why">Usa a AMI customizada. Para jobs internos e processamento batch com mais controle.</div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-layer">Aplicação</div>
+        <div class="stack-tech">Python + FastAPI</div>
+        <div class="stack-why">API leve e moderna. Dois endpoints: /saldo/{conta} e /health para o ALB.</div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-layer">Container</div>
+        <div class="stack-tech">Docker + ECR</div>
+        <div class="stack-why">Imagem da API versionada e armazenada no registry privado da AWS.</div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-layer">Banco de dados</div>
+        <div class="stack-tech">DynamoDB</div>
+        <div class="stack-why">Serverless, escala automático, tabelas isoladas por ambiente. Usado por fintechs reais.</div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-layer">Acesso seguro</div>
+        <div class="stack-tech">SSM Session Manager</div>
+        <div class="stack-why">Sem porta 22 aberta. Sem chave .pem. Acesso auditado no CloudWatch. Padrão bancário.</div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-layer">Segredos</div>
+        <div class="stack-tech">Secrets Manager <span class="stack-new">novo</span></div>
+        <div class="stack-why">Credenciais nunca ficam em variáveis de ambiente ou arquivos. Rotação automática.</div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-layer">CI/CD</div>
+        <div class="stack-tech">GitHub Actions</div>
+        <div class="stack-why">Pipeline automatizado: build → push ECR → deploy ECS. Trigger no push para main.</div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-layer">Observabilidade</div>
+        <div class="stack-tech">CloudWatch</div>
+        <div class="stack-why">Logs de auditoria de cada consulta + métricas + alertas de disponibilidade.</div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-layer">Interface do funcionário</div>
+        <div class="stack-tech">CLI Python + SSM Tunnel</div>
+        <div class="stack-why">Funcionário roda script local. Túnel SSM estabelece conexão segura. Exibe saldo no terminal.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Fases do projeto</div>
+    <div class="phases" id="phases"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Princípios do projeto</div>
+    <div class="principles">
+      <div class="principle">
+        <div class="p-icon">📖</div>
+        <div class="p-text"><strong>Explicação antes de execução.</strong> Cada passo será explicado com o "porquê" antes do "como". Entender a decisão é tão importante quanto implementá-la.</div>
+      </div>
+      <div class="principle">
+        <div class="p-icon">✅</div>
+        <div class="p-text"><strong>Testar antes de avançar.</strong> Cada fase tem critérios de validação. Só avançamos para a próxima quando a atual está funcionando e compreendida.</div>
+      </div>
+      <div class="principle">
+        <div class="p-icon">🏦</div>
+        <div class="p-text"><strong>Contexto corporativo real.</strong> Cada decisão técnica será justificada como seria em um banco de verdade — segurança, auditoria e disponibilidade são requisitos, não opcionais.</div>
+      </div>
+      <div class="principle">
+        <div class="p-icon">💼</div>
+        <div class="p-text"><strong>Portfólio de nível mid/senior.</strong> Ao final, você terá um projeto que demonstra decisões arquiteturais reais e que se destaca em entrevistas.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const phases = [
+  {
+    num: "01",
+    color: "#0C447C",
+    bg: "#E6F1FB",
+    name: "AMI customizada com Packer",
+    desc: "Criação da imagem base que alimenta toda a infraestrutura EC2",
+    deliverables: [
+      "Instalação e configuração do Packer",
+      "HCL template da AMI com Docker + agente ECS + SSM Agent pré-instalados",
+      "Build e publicação da AMI no AWS",
+      "Estrutura de pastas do projeto definida (packer/ fora de dev/prod)"
+    ],
+    learns: ["Packer HCL", "AMI lifecycle", "EC2 Image Builder vs Packer", "por que bake > user_data"]
+  },
+  {
+    num: "02",
+    color: "#085041",
+    bg: "#E1F5EE",
+    name: "Infraestrutura base com Terraform",
+    desc: "VPC, subnets, security groups, ALB e estado remoto — fundação de tudo",
+    deliverables: [
+      "Módulos Terraform: vpc, security-groups, alb, iam",
+      "Ambientes dev e prod isolados com workspaces ou diretórios separados",
+      "Backend remoto S3 + DynamoDB para lock de estado",
+      "Tabelas DynamoDB separadas por ambiente (bancox-dev-contas / bancox-prod-contas)"
+    ],
+    learns: ["Módulos Terraform", "DynamoDB como banco de dados", "isolamento dev/prod", "IAM roles mínimas"]
+  },
+  {
+    num: "03",
+    color: "#3C3489",
+    bg: "#EEEDFE",
+    name: "ECS — Fargate e EC2 launch type",
+    desc: "Clusters ECS com os dois launch types, cada um com seu propósito",
+    deliverables: [
+      "Cluster ECS com serviço Fargate para a API (consulta de saldo)",
+      "Cluster ECS com EC2 launch type usando a AMI customizada (workers)",
+      "Task definitions, services e auto scaling configurados",
+      "SSM Session Manager habilitado nas instâncias EC2"
+    ],
+    learns: ["Fargate vs EC2 launch type", "task definitions", "ECS auto scaling", "quando usar cada um"]
+  },
+  {
+    num: "04",
+    color: "#71280E",
+    bg: "#FAECE7",
+    name: "Aplicação — FastAPI + Docker + CLI",
+    desc: "A API que o banco roda e o CLI que o funcionário usa",
+    deliverables: [
+      "API FastAPI com /saldo/{conta_id} e /health consumindo DynamoDB",
+      "Dockerfile otimizado com multi-stage build",
+      "Push da imagem para ECR (Elastic Container Registry)",
+      "CLI Python com túnel SSM, exibição formatada e log de auditoria no CloudWatch",
+      "Script setup.sh de onboarding do funcionário"
+    ],
+    learns: ["FastAPI + DynamoDB boto3", "Docker multi-stage", "ECR", "SSM port forwarding", "auditoria de acesso"]
+  },
+  {
+    num: "05",
+    color: "#633806",
+    bg: "#FAEEDA",
+    name: "Secrets Manager + Segurança",
+    desc: "Credenciais seguras, zero segredos expostos no código ou ambiente",
+    deliverables: [
+      "Credenciais AWS do CLI armazenadas no Secrets Manager",
+      "IAM roles com permissões mínimas (principle of least privilege)",
+      "Security groups revisados — porta 22 fechada em prod",
+      "Validação de segurança: scan de segredos no repositório"
+    ],
+    learns: ["Secrets Manager vs env vars", "least privilege", "security groups auditoria", "segurança bancária"]
+  },
+  {
+    num: "06",
+    color: "#3B6D11",
+    bg: "#EAF3DE",
+    name: "CI/CD + Observabilidade + README",
+    desc: "Pipeline automatizado, logs de auditoria e documentação corporativa",
+    deliverables: [
+      "GitHub Actions: build → push ECR → deploy ECS no push para main",
+      "CloudWatch Logs: log de cada consulta com conta, usuário e timestamp",
+      "Alarmes CloudWatch para disponibilidade do serviço",
+      "README corporativo com diagrama de arquitetura e runbook de incidentes",
+      "LinkedIn post de conclusão do projeto"
+    ],
+    learns: ["GitHub Actions + AWS OIDC", "CloudWatch Logs estruturados", "runbook", "comunicação técnica"]
+  }
+];
+
+const container = document.getElementById('phases');
+phases.forEach((p, i) => {
+  const card = document.createElement('div');
+  card.className = 'phase-card';
+  card.innerHTML = `
+    <div class="phase-header" onclick="toggle(this.parentElement)">
+      <div class="phase-num" style="background:${p.bg};color:${p.color}">${p.num}</div>
+      <div class="phase-info">
+        <div class="phase-name">${p.name}</div>
+        <div class="phase-desc">${p.desc}</div>
+      </div>
+      <div class="phase-arrow">▶</div>
+    </div>
+    <div class="phase-body">
+      <div class="deliverables">
+        <div class="del-title">Entregáveis</div>
+        <ul class="del-list">${p.deliverables.map(d => `<li>${d}</li>`).join('')}</ul>
+      </div>
+      <div class="learns">
+        <div class="learn-title">O que você aprende nessa fase</div>
+        <ul class="learn-list">${p.learns.map(l => `<li>${l}</li>`).join('')}</ul>
+      </div>
+    </div>
+  `;
+  container.appendChild(card);
+});
+
+function toggle(card) {
+  card.classList.toggle('open');
+}
+</script>

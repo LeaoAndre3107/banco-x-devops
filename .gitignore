@@ -1,0 +1,24 @@
+# Terraform
+**/.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfstate.lock.info
+.terraform.lock.hcl
+
+# Arquivos locais
+*.zip
+*.pem
+*.env
+
+# Arquivos de IDs locais
+ID AMI.txt
+IDs ALB e ECR.txt
+IDs da VPC.txt
+
+# Relatórios gerados localmente
+app/cli/relatorio_*.txt
+
+# Python
+__pycache__/
+*.pyc
+.venv/
