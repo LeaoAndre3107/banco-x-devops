@@ -11,3 +11,9 @@ variable "instance_type" {
   type    = string
   default = "t3.micro"
 }
+
+variable "desired_count" {
+  description = "Número de tasks Fargate rodando simultaneamente"
+  type        = number
+  default     = 1
+}

@@ -42,4 +42,5 @@ module "ecs" {
   dynamodb_table_name   = module.dynamodb.table_name
   ami_id = var.ami_id
   instance_type = "t3.micro"
+  desired_count = 1
   }

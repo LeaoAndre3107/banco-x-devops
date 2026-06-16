@@ -48,7 +48,6 @@ resource "aws_iam_role_policy" "ecs_task" {
           "dynamodb:GetItem",
           "dynamodb:PutItem",
           "dynamodb:Query",
-          "dynamodb:Scan"
         ]
         Resource = "arn:aws:dynamodb:${var.aws_region}:*:table/${var.dynamodb_table_name}"
       },
@@ -163,7 +162,7 @@ resource "aws_ecs_service" "api" {
   name            = "${var.project}-${var.environment}-api"
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.api.arn
-  desired_count   = 2
+  desired_count   = var.desired_count
   launch_type     = "FARGATE"
 
   network_configuration {
