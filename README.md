@@ -124,18 +124,18 @@ aws logs filter-log-events \
 
 ## Como usar o CLI
 
-```bash
-# Ativar ambiente virtual
-source /home/leaos/bancox-cli-env/bin/activate
+## Como usar o CLI
 
-# Entrar no diretório da aplicação
-cd app/cli
+```bash
+# Criar e ativar ambiente virtual
+python3 -m venv .venv && source .venv/bin/activate
+
+# Instalar dependências
+pip install -r app/cli/requirements.txt
 
 # Iniciar o sistema
-python3 bancox_cli.py
+python3 app/cli/bancox_cli.py
 ```
-
-> O CLI busca automaticamente o endpoint da API no Secrets Manager. Nenhuma configuração manual necessária após o deploy.
 
 ---
 
