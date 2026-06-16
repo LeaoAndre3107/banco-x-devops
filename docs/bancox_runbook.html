@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Banco X — Runbook de Comandos</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0f1117; color: #e2e8f0; line-height: 1.7; }
+  .container { max-width: 900px; margin: 0 auto; padding: 40px 24px; }
+
+  .header { text-align: center; padding: 40px 0 48px; border-bottom: 1px solid #1e2535; margin-bottom: 48px; }
+  .badge { display: inline-block; background: #1a3a6b; color: #93c5fd; font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 4px; letter-spacing: 0.08em; margin-bottom: 16px; }
+  h1 { font-size: 32px; font-weight: 700; color: #f1f5f9; margin-bottom: 8px; }
+  .subtitle { color: #64748b; font-size: 15px; }
+  .meta { display: flex; gap: 32px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
+  .meta span { font-size: 13px; color: #475569; }
+  .meta strong { color: #94a3b8; }
+
+  .warning { background: #1c1a0e; border: 1px solid #854d0e; border-left: 4px solid #f59e0b; border-radius: 8px; padding: 16px 20px; margin-bottom: 48px; }
+  .warning-title { font-size: 13px; font-weight: 600; color: #fbbf24; margin-bottom: 6px; }
+  .warning p { font-size: 13px; color: #d97706; }
+
+  .phase { margin-bottom: 48px; }
+  .phase-header { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #1e2535; }
+  .phase-num { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+  .phase-title { font-size: 18px; font-weight: 600; color: #f1f5f9; }
+  .phase-desc { font-size: 13px; color: #64748b; margin-top: 2px; }
+
+  .step { margin-bottom: 20px; position: relative; }
+  .step-label { font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+  .step-note { font-size: 13px; color: #94a3b8; margin-bottom: 8px; line-height: 1.6; }
+
+  pre { background: #0d1117; border: 1px solid #1e2535; border-radius: 8px; padding: 16px 20px; overflow-x: auto; position: relative; }
+  code { font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace; font-size: 13px; line-height: 1.7; color: #e2e8f0; }
+  .comment { color: #4a5568; }
+
+  .copy-btn { position: absolute; top: 10px; right: 10px; background: #1e2535; border: 1px solid #2d3748; color: #64748b; font-size: 11px; padding: 4px 10px; border-radius: 4px; cursor: pointer; transition: all 0.2s; }
+  .copy-btn:hover { background: #2d3748; color: #94a3b8; }
+  .copy-btn.copied { color: #4ade80; border-color: #4ade80; }
+
+  .info-box { background: #0c1a2e; border: 1px solid #1e3a5f; border-radius: 8px; padding: 14px 18px; margin-bottom: 16px; }
+  .info-box p { font-size: 13px; color: #7dd3fc; }
+  .info-box strong { color: #93c5fd; }
+
+  .ids-box { background: #0c1a0c; border: 1px solid #1a3a1a; border-radius: 8px; padding: 16px 20px; margin-bottom: 20px; }
+  .ids-box-title { font-size: 11px; font-weight: 600; color: #4ade80; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+  .id-row { display: flex; gap: 12px; align-items: baseline; margin-bottom: 4px; flex-wrap: wrap; }
+  .id-key { font-size: 12px; color: #4b5563; min-width: 200px; }
+  .id-val { font-family: monospace; font-size: 13px; color: #86efac; word-break: break-all; }
+
+  .toc { background: #0d1117; border: 1px solid #1e2535; border-radius: 8px; padding: 20px 24px; margin-bottom: 48px; }
+  .toc-title { font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 12px; }
+  .toc-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .toc-list li a { font-size: 14px; color: #7dd3fc; text-decoration: none; display: flex; align-items: center; gap: 8px; }
+  .toc-list li a:hover { color: #93c5fd; }
+  .toc-num { font-size: 11px; color: #374151; min-width: 24px; }
+
+  .tag-new { display: inline-block; font-size: 10px; background: #1D9E75; color: #E1F5EE; padding: 1px 6px; border-radius: 3px; margin-left: 6px; vertical-align: middle; }
+
+  .divider { border: none; border-top: 1px solid #1e2535; margin: 40px 0; }
+
+  .footer { text-align: center; padding: 32px 0; border-top: 1px solid #1e2535; margin-top: 48px; }
+  .footer p { font-size: 13px; color: #374151; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="badge">CONFIDENCIAL — USO INTERNO</div>
+    <h1>Banco X — Runbook de Comandos</h1>
+    <div class="subtitle">Guia completo de restore da infraestrutura após terraform destroy</div>
+    <div class="meta">
+      <span><strong>Projeto:</strong> Banco X</span>
+      <span><strong>Fase atual:</strong> 05 / 06</span>
+      <span><strong>Cloud:</strong> AWS us-east-1</span>
+      <span><strong>Atualizado:</strong> Maio 2026</span>
+    </div>
+  </div>
+
+  <div class="warning">
+    <div class="warning-title">⚠️ Atenção antes de restaurar</div>
+    <p>Execute os passos <strong>na ordem apresentada</strong>. A AMI (ami-0f3a1a124baad0b82) e o secret do Secrets Manager <strong>não são destruídos</strong> pelo terraform destroy — eles persistem. Após o terraform apply, atualize o ALB URL no secret (Passo 03) e reinsira os dados do DynamoDB (Passo 04).</p>
+  </div>
+
+  <div class="toc">
+    <div class="toc-title">Índice</div>
+    <ul class="toc-list">
+      <li><a href="#fase0"><span class="toc-num">00</span> Verificações iniciais</a></li>
+      <li><a href="#fase1"><span class="toc-num">01</span> AMI com Packer (somente se necessário)</a></li>
+      <li><a href="#fase2"><span class="toc-num">02</span> Terraform apply — infraestrutura base</a></li>
+      <li><a href="#fase3"><span class="toc-num">03</span> Atualizar secret no Secrets Manager</a></li>
+      <li><a href="#fase4"><span class="toc-num">04</span> Populate do DynamoDB</a></li>
+      <li><a href="#fase5"><span class="toc-num">05</span> Build e push da imagem Docker</a></li>
+      <li><a href="#fase6"><span class="toc-num">06</span> Deploy ECS e validação da API</a></li>
+      <li><a href="#fase7"><span class="toc-num">07</span> Execução do CLI</a></li>
+      <li><a href="#fase8"><span class="toc-num">08</span> Auditoria e relatórios de acesso</a></li>
+      <li><a href="#refs"><span class="toc-num">—</span> IDs e referências do projeto</a></li>
+    </ul>
+  </div>
+
+  <!-- 00 -->
+  <div class="phase" id="fase0">
+    <div class="phase-header">
+      <div class="phase-num" style="background:#1e2535;color:#94a3b8">00</div>
+      <div><div class="phase-title">Verificações iniciais</div><div class="phase-desc">Confirmar ambiente local antes de qualquer comando</div></div>
+    </div>
+    <div class="step">
+      <div class="step-label">Ferramentas instaladas</div>
+      <pre><code>packer version
+terraform version
+aws --version
+docker --version
+session-manager-plugin --version</code></pre>
+      <button class="copy-btn" onclick="copyCode(this)">copiar</button>
+    </div>
+    <div class="step">
+      <div class="step-label">Credenciais AWS root</div>
+      <pre><code>aws sts get-caller-identity</code></pre>
+      <button class="copy-btn" onclick="copyCode(this)">copiar</button>
+      <div class="step-note">Deve retornar Account ID <strong>905542450009</strong>.</div>
+    </div>
+    <div class="step">
+      <div class="step-label">Credenciais do funcionário</div>
+      <pre><code>aws sts get-caller-identity --profile bancox-funcionario</code></pre>
+      <button class="copy-btn" onclick="copyCode(this)">copiar</button>
+      <div class="step-note">Deve retornar <strong>arn:aws:iam::905542450009:user/bancox-funcionario</strong>. Se falhar, veja o Passo 03b.</div>
+    </div>
+    <div class="step">
+      <div class="step-label">Verificar AMI</div>
+      <pre><code>aws ec2 describe-images \
+  --image-ids ami-0f3a1a124baad0b82 \
+  --query 'Images[0].{Nome:Name,Estado:State}' \
+  --output table</code></pre>
+      <button class="copy-btn" onclick="copyCode(this)">copiar</button>
+      <div class="step-note">Se Estado = <strong>available</strong>, pule o Passo 01.</div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- 01 -->
+  <div class="phase" id="fase1">
+    <div class="phase-header">
+      <div class="phase-num" style="background:#1a3a6b;color:#93c5fd">01</div>
+      <div><div class="phase-title">AMI com Packer (somente se necessário)</div><div class="phase-desc">Recriar a AMI base caso tenha sido desregistrada manualmente</div></div>
+    </div>
+    <div class="info-box"><p>⚡ <strong>Na maioria dos casos pule este passo.</strong> O terraform destroy não apaga a AMI.</p></div>
+    <div class="step">
+      <div class="step-label">Validar e build</div>
+      <pre><code>cd /mnt/e/DEVOPS\ GUIADO/BANCO\ X/packer
+packer init .
+packer validate .
+packer build ami.pkr.hcl</code></pre>
+      <button class="copy-btn" onclick="copyCode(this)">copiar</button>
+      <div class="step-note">Ao final anote o novo AMI ID e atualize em <code>dev/main.tf</code>: <code>ami_id = "ami-XXXXXXXXXXXXXXXXX"</code></div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- 02 -->
+  <div class="phase" id="fase2">
+    <div class="phase-header">
+      <div class="phase-num" style="background:#0f3a1a;color:#4ade80">02</div>
+      <div><div class="phase-title">Terraform apply — infraestrutura base</div><div class="phase-desc">VPC, subnets, ALB, ECS cluster, ECR, DynamoDB</div></div>
+    </div>
+    <div class="step">
+      <div class="step-label">Aplicar infraestrutura (~5-8 minutos)</div>
+      <pre><code>cd /mnt/e/DEVOPS\ GUIADO/BANCO\ X/dev
+terraform init
+terraform plan
+terraform apply</code></pre>
+      <button class="copy-btn" onclick="copyCode(this)">copiar</button>
+      <div class="step-note">Confirme com <strong>yes</strong>. Leva ~5-8 minutos pelo NAT Gateway.</div>
+    </div>
+    <div class="step">
+      <div class="step-label">Anotar outputs (ALB DNS muda a cada apply!)</div>
+      <pre><code>terraform output</code></pre>
+      <button class="copy-btn" onclick="copyCode(this)">copiar</button>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- 03 -->
+  <div class="phase" id="fase3">
+    <div class="phase-header">
+      <div class="phase-num" style="background:#2d1a00;color:#fb923c">03</div>
+      <div><div class="phase-title">Atualizar secret no Secrets Manager <span class="tag-new">importante</span></div><div class="phase-desc">O ALB DNS muda após cada apply — o secret precisa ser atualizado</div></div>
+    </div>
+    <div class="info-box"><p>⚡ O secret <strong>bancox/dev/config</strong> persiste após o destroy. Só precisa atualizar o <code>alb_url</code> com o novo DNS.</p></div>
+    <div class="step">
+      <div class="step-label">Atualizar o ALB URL no secret</div>
+      <pre><code><span class="comment"># Pegar o DNS atual automaticamente</span>
+ALB_DNS=$(cd /mnt/e/DEVOPS\ GUIADO/BANCO\ X/dev && terraform output -raw alb_dns_name)
+
+<span class="comment"># Atualizar o secret</span>
+aws secretsmanager update-secret \
+  --secret-id "bancox/dev/config" \
+  --secret-string "{
+    \"alb_url\": \"http://$ALB_DNS\",
+    \"cluster\": \"bancox-dev\",
+    \"environment\": \"dev\",
+    \"version\": \"1.0.0\"
+  }"</code></pre>
+      <button class="copy-btn" onclick="copyCode(this)">copiar</button>
+    </div>
+    <div class="step">
+      <div class="step-label">Confirmar secret atualizado</div>
+      <pre><code>aws secretsmanager get-secret-value \
+  --secret-id "bancox/dev/config" \
+  --query 'SecretString' \
+  --output text</code></pre>
+      <button class="copy-btn" onclick="copyCode(this)">copiar</button>
+    </div>
+    <div class="step">
+      <div class="step-label">03b — Reconfigurar perfil bancox-funcionario (se necessário)</div>
+      <pre><code>aws configure --profile bancox-funcionario
+<span class="comment"># Access Key ID : AKIA5FVUJHNM7D6P2OFX</span>
+<span class="comment"># Secret Key    : (guarde em local seguro)</span>
+<span class="comment"># Region        : us-east-1</span>
+<span class="comment"># Output format : json</span>
+
+<span class="comment"># Verificar</span>
+aws sts get-caller-identity --profile bancox-funcionario</code></pre>
+      <button class="copy-btn" onclick="copyCode(this)">copiar</button>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- 04 -->
+  <div class="phase" id="fase4">
+    <div class="phase-header">
+      <div class="phase-num" style="background:#1a1535;color:#c4b5fd">04</div>
+      <div><div class="phase-title">Populate do DynamoDB</div><div class="phase-desc">Reinserir dados de contas bancárias — apagados a cada terraform apply</div></div>
+    </div>
+    <div class="step">
+      <div class="step-label">Inserir as 3 contas de teste</div>
+      <pre><code>aws dynamodb put-item \
+  --table-name bancox-dev-contas \
+  --item '{"conta_id": {"S": "12345-6"}, "titular": {"S": "Andre Leao"}, "saldo": {"N": "4750.00"}, "agencia": {"S": "0001"}}'
+
+aws dynamodb put-item \
+  --table-name bancox-dev-contas \
+  --item '{"conta_id": {"S": "98765-4"}, "titular": {"S": "Maria Silva"}, "saldo": {"N": "12300.50"}, "agencia": {"S": "0001"}}'
+
+aws dynamodb put-item \
+  --table-name bancox-dev-contas \
+  --item '{"conta_id": {"S": "55555-0"}, "titular": {"S": "Joao Souza"}, "saldo": {"N": "890.75"}, "agencia": {"S": "0002"}}'</code></pre>
+      <button class="copy-btn" onclick="copyCode(this)">copiar</button>
+    </div>
+    <div class="step">
+      <div class="step-label">Confirmar dados inseridos</div>
+      <pre><code>aws dynamodb scan \
+  --table-name bancox-dev-contas \
+  --query 'Items[*].{Conta:conta_id.S,Titular:titular.S,Saldo:saldo.N}' \
+  --output table</code></pre>
+      <button class="copy-btn" onclick="copyCode(this)">copiar</button>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- 05 -->
+  <div class="phase" id="fase5">
+    <div class="phase-header">
+      <div class="phase-num" style="background:#1a2a1a;color:#86efac">05</div>
+      <div><div class="phase-title">Build e push da imagem Docker</div><div class="phase-desc">Recompilar e enviar a imagem da API para o ECR</div></div>
+    </div>
+    <div class="step">
+      <div class="step-label">Build, tag e push</div>
+      <pre><code>cd /mnt/e/DEVOPS\ GUIADO/BANCO\ X/app/api
+
+<span class="comment"># Autenticar no ECR</span>
+aws ecr get-login-password --region us-east-1 | \
+  docker login --username AWS --password-stdin \
+  905542450009.dkr.ecr.us-east-1.amazonaws.com
+
+<span class="comment"># Build</span>
+docker build -t bancox-dev-api .
+
+<span class="comment"># Tag e push</span>
+docker tag bancox-dev-api:latest \
+  905542450009.dkr.ecr.us-east-1.amazonaws.com/bancox-dev-api:latest
+
+docker push \
+  905542450009.dkr.ecr.us-east-1.amazonaws.com/bancox-dev-api:latest</code></pre>
+      <button class="copy-btn" onclick="copyCode(this)">copiar</button>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- 06 -->
+  <div class="phase" id="fase6">
+    <div class="phase-header">
+      <div class="phase-num" style="background:#1a0a2e;color:#a78bfa">06</div>
+      <div><div class="phase-title">Deploy ECS e validação da API</div><div class="phase-desc">Forçar deploy e validar que o sistema está respondendo</div></div>
+    </div>
+    <div class="step">
+      <div class="step-label">Forçar novo deployment</div>
+      <pre><code>aws ecs update-service \
+  --cluster bancox-dev \
+  --service bancox-dev-api \
+  --force-new-deployment</code></pre>
+      <button class="copy-btn" onclick="copyCode(this)">copiar</button>
+    </div>
+    <div class="step">
+      <div class="step-label">Aguardar ~60s e verificar tasks (devem aparecer 2)</div>
+      <pre><code>aws ecs list-tasks \
+  --cluster bancox-dev \
+  --query 'taskArns' \
+  --output table</code></pre>
+      <button class="copy-btn" onclick="copyCode(this)">copiar</button>
+    </div>
+    <div class="step">
+      <div class="step-label">Validar endpoints</div>
+      <pre><code>ALB_DNS=$(cd /mnt/e/DEVOPS\ GUIADO/BANCO\ X/dev && terraform output -raw alb_dns_name)
+
+curl http://$ALB_DNS/health
+curl http://$ALB_DNS/saldo/12345-6</code></pre>
+      <button class="copy-btn" onclick="copyCode(this)">copiar</button>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- 07 -->
+  <div class="phase" id="fase7">
+    <div class="phase-header">
+      <div class="phase-num" style="background:#1a2535;color:#67e8f9">07</div>
+      <div><div class="phase-title">Execução do CLI</div><div class="phase-desc">Interface do funcionário — busca configuração do Secrets Manager automaticamente</div></div>
+    </div>
+    <div class="step">
+      <div class="step-label">Ativar venv e iniciar</div>
+      <pre><code>source /home/leaos/bancox-cli-env/bin/activate
+
+cd /mnt/e/DEVOPS\ GUIADO/BANCO\ X/app/cli
+python3 bancox_cli.py</code></pre>
+      <button class="copy-btn" onclick="copyCode(this)">copiar</button>
+      <div class="step-note">O CLI usa o perfil <strong>bancox-funcionario</strong> e busca a URL do ALB no Secrets Manager. Nenhum valor hardcoded no código.</div>
+    </div>
+    <div class="step">
+      <div class="step-label">Contas de teste</div>
+      <pre><code>12345-6   <span class="comment"># Andre Leao  — Agência 0001 — R$ 4.750,00</span>
+98765-4   <span class="comment"># Maria Silva — Agência 0001 — R$ 12.300,50</span>
+55555-0   <span class="comment"># Joao Souza  — Agência 0002 — R$ 890,75</span></code></pre>
+      <button class="copy-btn" onclick="copyCode(this)">copiar</button>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- 08 -->
+  <div class="phase" id="fase8">
+    <div class="phase-header">
+      <div class="phase-num" style="background:#2a1a00;color:#fbbf24">08</div>
+      <div><div class="phase-title">Auditoria e relatórios de acesso <span class="tag-new">novo</span></div><div class="phase-desc">Consultar logs do CloudWatch — uso em auditorias fiscais e relatórios gerenciais</div></div>
+    </div>
+    <div class="step">
+      <div class="step-label">Ver todas as consultas registradas</div>
+      <pre><code>aws logs filter-log-events \
+  --log-group-name "/bancox/dev/api" \
+  --filter-pattern "AUDITORIA" \
+  --query 'events[*].message' \
+  --output table</code></pre>
+      <button class="copy-btn" onclick="copyCode(this)">copiar</button>
+    </div>
+    <div class="step">
+      <div class="step-label">Filtrar por conta específica</div>
+      <pre><code>aws logs filter-log-events \
+  --log-group-name "/bancox/dev/api" \
+  --filter-pattern "\"conta=12345-6\"" \
+  --query 'events[*].message' \
+  --output table</code></pre>
+      <button class="copy-btn" onclick="copyCode(this)">copiar</button>
+      <div class="step-note">Substitua <code>12345-6</code> pelo número da conta desejada.</div>
+    </div>
+    <div class="step">
+      <div class="step-label">Consultas de hoje</div>
+      <pre><code>aws logs filter-log-events \
+  --log-group-name "/bancox/dev/api" \
+  --filter-pattern "AUDITORIA" \
+  --start-time $(date -d 'today 00:00:00' +%s000) \
+  --query 'events[*].message' \
+  --output table</code></pre>
+      <button class="copy-btn" onclick="copyCode(this)">copiar</button>
+    </div>
+    <div class="step">
+      <div class="step-label">Gerar relatório em arquivo (para entrega em auditoria)</div>
+      <pre><code>aws logs filter-log-events \
+  --log-group-name "/bancox/dev/api" \
+  --filter-pattern "AUDITORIA" \
+  --query 'events[*].message' \
+  --output text > relatorio_auditoria_$(date +%Y%m%d).txt
+
+cat relatorio_auditoria_$(date +%Y%m%d).txt</code></pre>
+      <button class="copy-btn" onclick="copyCode(this)">copiar</button>
+    </div>
+    <div class="step">
+      <div class="step-label">Consultar período específico (auditoria fiscal)</div>
+      <pre><code><span class="comment"># Converter datas para Unix timestamp em milissegundos</span>
+START=$(date -d '2026-05-01' +%s000)
+END=$(date -d '2026-05-31' +%s000)
+
+aws logs filter-log-events \
+  --log-group-name "/bancox/dev/api" \
+  --filter-pattern "AUDITORIA" \
+  --start-time $START \
+  --end-time $END \
+  --query 'events[*].message' \
+  --output text > relatorio_maio_2026.txt</code></pre>
+      <button class="copy-btn" onclick="copyCode(this)">copiar</button>
+    </div>
+    <div class="step">
+      <div class="step-label">Verificar log streams ativos</div>
+      <pre><code>aws logs describe-log-streams \
+  --log-group-name "/bancox/dev/api" \
+  --order-by LastEventTime \
+  --descending \
+  --max-items 5 \
+  --query 'logStreams[*].{Stream:logStreamName,UltimoEvento:lastEventTimestamp}' \
+  --output table</code></pre>
+      <button class="copy-btn" onclick="copyCode(this)">copiar</button>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- REFS -->
+  <div class="phase" id="refs">
+    <div class="phase-header">
+      <div class="phase-num" style="background:#1e2535;color:#94a3b8">—</div>
+      <div><div class="phase-title">IDs e referências do projeto</div><div class="phase-desc">Valores fixos da conta AWS — alguns mudam após terraform apply</div></div>
+    </div>
+
+    <div class="ids-box">
+      <div class="ids-box-title">Valores fixos (não mudam)</div>
+      <div class="id-row"><span class="id-key">AWS Account ID</span><span class="id-val">905542450009</span></div>
+      <div class="id-row"><span class="id-key">Região</span><span class="id-val">us-east-1</span></div>
+      <div class="id-row"><span class="id-key">AMI customizada</span><span class="id-val">ami-0f3a1a124baad0b82</span></div>
+      <div class="id-row"><span class="id-key">AMI nome</span><span class="id-val">banco_x-base-1777908718</span></div>
+      <div class="id-row"><span class="id-key">S3 state bucket</span><span class="id-val">bancox-terraform-state</span></div>
+      <div class="id-row"><span class="id-key">DynamoDB lock table</span><span class="id-val">bancox-terraform-lock</span></div>
+      <div class="id-row"><span class="id-key">DynamoDB contas</span><span class="id-val">bancox-dev-contas</span></div>
+      <div class="id-row"><span class="id-key">ECS Cluster</span><span class="id-val">bancox-dev</span></div>
+      <div class="id-row"><span class="id-key">ECS Service</span><span class="id-val">bancox-dev-api</span></div>
+      <div class="id-row"><span class="id-key">ECR Registry</span><span class="id-val">905542450009.dkr.ecr.us-east-1.amazonaws.com</span></div>
+      <div class="id-row"><span class="id-key">CloudWatch Log Group</span><span class="id-val">/bancox/dev/api</span></div>
+      <div class="id-row"><span class="id-key">Secrets Manager</span><span class="id-val">bancox/dev/config</span></div>
+      <div class="id-row"><span class="id-key">Secret ARN</span><span class="id-val">arn:aws:secretsmanager:us-east-1:905542450009:secret:bancox/dev/config-n4JPNt</span></div>
+      <div class="id-row"><span class="id-key">IAM Policy CLI</span><span class="id-val">arn:aws:iam::905542450009:policy/bancox-dev-cli-policy</span></div>
+      <div class="id-row"><span class="id-key">IAM User funcionário</span><span class="id-val">bancox-funcionario</span></div>
+      <div class="id-row"><span class="id-key">IAM Access Key ID</span><span class="id-val">AKIA5FVUJHNM7D6P2OFX</span></div>
+      <div class="id-row"><span class="id-key">AWS Profile CLI</span><span class="id-val">bancox-funcionario</span></div>
+      <div class="id-row"><span class="id-key">venv CLI</span><span class="id-val">/home/leaos/bancox-cli-env</span></div>
+    </div>
+
+    <div class="ids-box" style="background:#1c0a0a;border-color:#3a1a1a;">
+      <div class="ids-box-title" style="color:#f87171;">Valores que mudam após terraform apply</div>
+      <div class="id-row"><span class="id-key">ALB DNS</span><span class="id-val" style="color:#fca5a5;">terraform output alb_dns_name</span></div>
+      <div class="id-row"><span class="id-key">ECR URL completa</span><span class="id-val" style="color:#fca5a5;">terraform output ecr_repository_url</span></div>
+      <div class="id-row"><span class="id-key">VPC ID</span><span class="id-val" style="color:#fca5a5;">terraform output vpc_id</span></div>
+      <div class="id-row"><span class="id-key">Subnet IDs</span><span class="id-val" style="color:#fca5a5;">terraform output public_subnets / private_subnets</span></div>
+    </div>
+
+    <div class="step">
+      <div class="step-label">Obter todos os outputs atuais</div>
+      <pre><code>cd /mnt/e/DEVOPS\ GUIADO/BANCO\ X/dev && terraform output</code></pre>
+      <button class="copy-btn" onclick="copyCode(this)">copiar</button>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>Banco X — Projeto de portfólio DevOps/Cloud Engineering · André Leão · GitHub: LeaoAndre3107</p>
+  </div>
+
+</div>
+<script>
+function copyCode(btn) {
+  const pre = btn.previousElementSibling;
+  const text = pre ? pre.innerText : '';
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'copiado!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'copiar'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+</script>
+</body>
+</html>
