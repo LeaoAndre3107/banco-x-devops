@@ -6,15 +6,16 @@ Sistema corporativo simulado com API interna, CLI para funcionários e infraestr
 
 ## Arquitetura
 
-![Arquitetura Banco X](docs/architecture.svg)
+![Arquitetura Banco X](docs/bancox_architecture_diagram.svg)
 
 O sistema opera inteiramente em **subnet privada**, sem exposição direta à internet. O acesso do funcionário acontece via **SSM Session Manager** com port forwarding — zero porta 22 aberta.
 
 ---
 
+## Demonstração
+
 ### CLI em operação
 
-![CLI Banco X](docs/cli-demo.png)
 
 O CLI conecta ao ambiente via **Secrets Manager** na inicialização, buscando o endpoint da API dinamicamente. Suporta múltiplas consultas por sessão, com tratamento de conta não encontrada e exibição formatada de saldo.
 
