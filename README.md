@@ -6,7 +6,7 @@ Sistema corporativo simulado com API interna, CLI para funcionários e infraestr
 
 ## Arquitetura
 
-![Arquitetura Banco X](Docs/architecture.svg)
+![Arquitetura Banco X](docs/architecture.svg)
 
 O sistema opera inteiramente em **subnet privada**, sem exposição direta à internet. O acesso do funcionário acontece via **SSM Session Manager** com port forwarding — zero porta 22 aberta.
 
