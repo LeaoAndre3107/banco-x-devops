@@ -40,6 +40,6 @@ module "ecs" {
   ecs_security_group_id = module.alb.ecs_security_group_id
   target_group_arn      = module.alb.target_group_arn
   dynamodb_table_name   = module.dynamodb.table_name
-  ami_id                = "ami-0f3a1a124baad0b82"
+  ami_id = var.ami_id
   instance_type = "t3.micro"
   }
